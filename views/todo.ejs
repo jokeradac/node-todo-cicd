@@ -82,8 +82,77 @@
                 cursor: pointer;
             }
 
-            input[type="submit"]:hover {
+    input[type="submit"]:hover {
                 background-color: #45a049;
+            }
+
+            .modal-overlay {
+                display: none;
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(0, 0, 0, 0.5);
+                z-index: 1000;
+                justify-content: center;
+                align-items: center;
+            }
+
+            .modal-overlay.active {
+                display: flex;
+            }
+
+            .modal {
+                background: white;
+                border-radius: 8px;
+                padding: 20px;
+                max-width: 400px;
+                width: 90%;
+                box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+            }
+
+            .modal h3 {
+                margin-top: 0;
+                color: #333;
+            }
+
+            .modal p {
+                color: #666;
+                word-break: break-word;
+            }
+
+            .modal-buttons {
+                display: flex;
+                gap: 10px;
+                justify-content: flex-end;
+                margin-top: 20px;
+            }
+
+            .modal-buttons button {
+                padding: 8px 16px;
+                border: none;
+                border-radius: 4px;
+                cursor: pointer;
+                font-size: 14px;
+            }
+
+            .btn-confirm {
+                background-color: #4CAF50;
+                color: white;
+            }
+
+            .btn-confirm:hover {
+                background-color: #45a049;
+            }
+
+            .btn-cancel {
+                background-color: #ccc;
+                color: #333;
+            }
+
+            .btn-cancel:hover {
+                background-color: #999;
             }
         </style>
     </head>
@@ -100,12 +169,56 @@
             <% }); %>
         </ul>
 
-        <form action="/todo/add/" method="post">
+        <form id="todoForm" action="/todo/add/" method="post">
             <p>
                 <label for="newtodo">What should I do?</label>
                 <input type="text" name="newtodo" id="newtodo" autofocus />
                 <input type="submit" value="Add" />
             </p>
         </form>
+
+        <div id="confirmModal" class="modal-overlay">
+            <div class="modal">
+                <h3>Confirmar nota</h3>
+                <p>¿Deseas agregar esta nota?</p>
+                <p id="modalNoteText"></p>
+                <div class="modal-buttons">
+                    <button type="button" class="btn-cancel" onclick="closeModal()">Cancelar</button>
+                    <button type="button" class="btn-confirm" onclick="confirmAdd()">Confirmar</button>
+                </div>
+            </div>
+        </div>
+
+        <script>
+            const form = document.getElementById('todoForm');
+            const modal = document.getElementById('confirmModal');
+            const noteInput = document.getElementById('newtodo');
+            const modalNoteText = document.getElementById('modalNoteText');
+
+            form.addEventListener('submit', function(e) {
+                e.preventDefault();
+                const noteText = noteInput.value.trim();
+                if (noteText === '') {
+                    noteInput.focus();
+                    return;
+                }
+                modalNoteText.textContent = noteText;
+                modal.classList.add('active');
+            });
+
+            function closeModal() {
+                modal.classList.remove('active');
+            }
+
+            function confirmAdd() {
+                form.submit();
+            }
+
+            noteInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    form.dispatchEvent(new Event('submit'));
+                }
+            });
+        </script>
     </body>
 </html>
